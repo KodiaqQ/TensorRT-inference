@@ -10,8 +10,7 @@ import numpy as np
 import sys
 import time
 
-import utils.ascii as helper
-import utils.dataset as data
+import utils
 
 
 class FrozenGraph(object):
@@ -101,18 +100,17 @@ def main():
     model.summary()
 
     # load mnist dataset
-    x_test, y_test = data.get_test_dataset()
+    x_test, y_test = utils.get_test_dataset()
     batch_size = 1000
     img_h = x_test.shape[1]
     img_w = x_test.shape[2]
-    helper.print_ascii(x_test[0], img_h, img_w)
 
     # use Keras to do infer
     t0 = time.time()
     y_keras = model.predict(x_test)
     t1 = time.time()
     print('Keras time', t1 - t0)
-    data.verify(y_keras, y_test)
+    utils.verify(y_keras, y_test)
 
     frozen_graph = FrozenGraph(model, (img_h, img_w, 1))
 
