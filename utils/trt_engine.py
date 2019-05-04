@@ -1,10 +1,10 @@
-from tf_engine import TfEngine
+from utils.tf_engine import TFEngine
 from tensorflow.contrib import tensorrt as tftrt
 import copy
 import numpy as np
 
 
-class TftrtEngine(TfEngine):
+class TRTEngine(TFEngine):
     def __init__(self, graph, batch_size, precision):
         tftrt_graph = tftrt.create_inference_graph(
             graph.frozen,
@@ -16,7 +16,7 @@ class TftrtEngine(TfEngine):
 
         opt_graph = copy.deepcopy(graph)
         opt_graph.frozen = tftrt_graph
-        super(TftrtEngine, self).__init__(opt_graph)
+        super(TRTEngine, self).__init__(opt_graph)
         self.batch_size = batch_size
 
     def infer(self, x):
