@@ -1,23 +1,24 @@
-import tensorrt as tftrt
 import configparser
-import numpy as np
 import re
-import loader
+import modeler
 import argparse
+from keras.datasets import mnist
+import keras.backend as K
 
 
-def verify(result, ans):
-    num_tests = ans.shape[0]
-    error = 0
-    for i in range(0, num_tests):
-        a = np.argmax(ans[i])
-        r = np.argmax(result[i])
-        if (a != r): error += 1
+def get_test_dataset():
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    img_h = x_test.shape[1]
+    img_w = x_test.shape[2]
 
-    if (error == 0):
-        print('PASSED')
+    if K.image_data_format() == 'channels_first':
+        x_test = x_test.reshape(x_test.shape[0], 1, img_h, img_w)
     else:
-        print('FAILURE')
+        x_test = x_test.reshape(x_test.shape[0], img_h, img_w, 1)
+
+    x_test = x_test.astype('float32')
+    x_test /= 255
+    return x_test, y_test
 
 
 if __name__ == '__main__':
@@ -31,19 +32,25 @@ if __name__ == '__main__':
 
     regex = re.compile(r'Model_\d+')
 
-    loader = loader.Loader()
-
     model_names = list(filter(regex.search, config.sections()))
 
+    x_test, y_test = get_test_dataset()
+    img_h = x_test.shape[1]
+    img_w = x_test.shape[2]
+
     for model_name in model_names:
+
         model_path = config[model_name]['path']
         model_type = config[model_name]['type']
         height = config[model_name]['height']
         width = config[model_name]['width']
-        batch = config[model_name]['batch']
+        batch_size = config[model_name]['batch']
 
-        model = loader.load(path=model_path, type=model_type)
+        model = modeler.Modeler(type=model_type, name=model_name)
 
         if model is None:
             print(model_type + ' type is not loaded or supported for ' + model_name)
             continue
+
+        model.infer(data=x_test, path=model_path)
+

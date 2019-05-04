@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-class TfEngine(object):
+class TFEngine(object):
     def __init__(self, graph):
         g = tf.Graph()
         with g.as_default():

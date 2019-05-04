@@ -2,7 +2,7 @@ import keras.backend as K
 import tensorflow as tf
 
 
-class FrozenGraph(object):
+class Freezer(object):
     def __init__(self, model, shape):
         shape = (None, shape[0], shape[1], shape[2])
         x_name = 'image_tensor_x'
