@@ -1,2 +1,0 @@
-# TensorRT-inference
-TensorRT inference
